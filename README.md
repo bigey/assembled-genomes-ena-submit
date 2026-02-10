@@ -1,69 +1,92 @@
 
 # assembled-genomes-ena-submit
 
-Scripts used for the submisssion of assembled genomes to ENA repository
+Genome assemblies can be submitted to the European Nucleotide Archive (ENA) using the Webin command line submission interface with `-context genome` option.
 
-## MANIFEST FILE
+Each submission must be associated with a pre-registered study and a sample.
 
-The manifest file contains metadata about the genome assembly. The file is a tab-separated text file with two columns (first column -> second column).
+The set of files that are part of the submission are specified using a manifest file.
+
+## mandatory MANIFEST FILE
+
+The manifest file contains metadata about the genome assembly. The file is a tab-separated (TSV) text file with two columns.
 
 The following metadata fields are supported in the manifest file for genome context:
 
-+ STUDY: Study accession - mandatory
-+ SAMPLE: Sample accession - mandatory
-+ ASSEMBLYNAME: Unique assembly name, user-provided - mandatory
-+ ASSEMBLY_TYPE: "clone" or "isolate" - mandatory
-+ COVERAGE: The estimated depth of sequencing coverage - mandatory
-+ PROGRAM: The assembly program - mandatory
-+ PLATFORM: The sequencing platform, or comma-separated list of platforms - mandatory
+Mandatory columns:
+
++ STUDY: Study accession - **mandatory**, preregistered study (starts with PRJEB and is called the BioProject accession)
++ SAMPLE: Sample accession - **mandatory**, preregistered sample (starts with SAMN and is called the BioSample accession)
++ ASSEMBLYNAME: Unique assembly name, user-provided - **mandatory**
++ ASSEMBLY_TYPE: "clone" or "isolate" - **mandatory**
++ COVERAGE: The estimated depth of sequencing coverage - **mandatory**
++ PROGRAM: The assembly program - **mandatory**
++ PLATFORM: The sequencing platform, or comma-separated list of platforms - **mandatory**
+
+Optional columns:
+
 + MOLECULETYPE: "genomic DNA", "genomic RNA" or "viral cRNA" - optional
 + MINGAPLENGTH: Minimum length of consecutive Ns to be considered a gap - optional
 + DESCRIPTION: Free text description of the genome assembly - optional
 + RUN_REF: Comma separated list of run accession(s) - optional
 + AGP: file that describes the assembly of scaffolds from contigs, or of chromosomes from scaffolds - optional
-+ FLATFILE: file containing the sequences in EMBL flat file format - mandatory for annotated assembly (see below)
-+ CHROMOSOME_LIST: file containing the list of chromosomes - mandatory for fully assembled chromosomes (see below)
 
-```{}
-MANIFEST="manifest.tsv"
+Assembly specifics columns:
+
++ FASTA: file containing the sequences in FASTA format - **mandatory** for **unannotated** assembly (see below)
++ FLATFILE: file containing the sequences in EMBL flat file format - **mandatory** for **annotated** assembly (see below)
++ CHROMOSOME_LIST: file containing the list of chromosomes - **mandatory** for fully assembled chromosomes (see below)
+
+## FASTA FILE for unannotated assemblies
+
+The FASTA flat file is mandatory for **unannotated** assemblies.  It is obtained by concatenating the individual FASTA files and should be compressed with gzip.
+
+To obtain the FASTA file use this command:
+
+```sh
+cat *.fasta | gzip -c > flat-file.fasta.gz
 ```
 
-## EMBL FLATFILE
+Then add this line to the manifest file:
 
-The EMBL flat file is mandatory for annotated assemblies.
+    FASTA<tab>flat-file.fasta.gz
 
-It is obtained by concatening of the individual EMBL files and should be compressed with gzip.
+## EMBL FLATFILE for annotated assemblies
+
+The EMBL flat file is mandatory for **annotated** assemblies. It is obtained by concatenating the individual EMBL files and should be compressed with gzip.
 
 To obtain the EMBL flat file use this command:
 
-```{sh}
+```sh
 cat *.embl | gzip -c > flat-file.embl.gz
 ```
 
 Then add this line to the manifest file:
 
-```{}
-FLATFILE flat-file.embl.gz
-```
+    FLATFILE<tab>flat-file.embl.gz
 
 ## CHROMOSOME LIST FILE
 
-The chromosome list file is optional and is only required for fully assembled chromosomes. The file contains the list of chromosomes to be submitted.
+The chromosome list file is **mandatory** only for fully assembled chromosomes. The file contains the list of chromosomes to be submitted.
 
-It is a tab-separated text file up to four columns, and must be compressed with gzip.
+It is a tab-separated (TSV) text file up to four columns, and must be compressed with gzip.
 
 Columns:
 
 1. Sequence ID: unique sequence name, in FASTA file this is the ID (">ID") or in EMBL flat file this is the accession ("AC   ID"), e.g. "chromA"
 2. Chromosome name: the name of the chromosome, e.g. "A"
-3. Chromosome topology [linear, circular] and type [chromosome, plasmid, or other]: e.g. "linear-chromosome"
-4. Chromosome location (optional): e.g. "Mitochondrion"
+3. Chromosome topology: [linear, circular] and type [chromosome, plasmid, or other]: e.g. "linear-chromosome"
+4. Chromosome location (optional column): e.g. "Mitochondrion"
+
+Compress the file with gzip:
+
+```sh
+gzip chromosome-list.tsv
+```
 
 Then add this line to the manifest file:
 
-```{}
-CHROMOSOME_LIST chromosome-list.tsv.gz
-```
+    CHROMOSOME_LIST<tab>chromosome-list.tsv.gz
 
 ## Obtain the executable Java JAR file
 

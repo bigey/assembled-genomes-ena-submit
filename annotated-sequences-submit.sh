@@ -1,14 +1,17 @@
-set -e
+#!/bin/bash
+set -euo pipefail
+
+# Downloaded from: https://github.com/bigey/assembled-genomes-ena-submit
 
 #================================================================================
 # PARAMETERS 
 #================================================================================
 
-# TEST/SUBMIT YOUR DATA
+# Submit or test?
 # One of the following:
-# "true": submit to testing server, 
-# "false": real data submission
-TEST="true"
+# "true": real data submission,
+# "false": submit to testing server, validation only
+SUBMISSION="false"
 
 # CREDENTIAL FILE
 # File containing the credentials. 
@@ -26,15 +29,14 @@ MANIFEST="manifest.tsv"
 #===============================================================================
 
 # CHECKING ENVIRONMENT
-# Check if the required tools are installed
+
+# Check if Java is installed 
 if ! command -v java &> /dev/null; then
     echo "Java is not installed. Please install Java to run this script."
     exit 1
 fi
-if ! command -v gzip &> /dev/null; then
-    echo "gzip is not installed. Please install gzip to run this script."
-    exit 1
-fi
+
+# Check if Webin submission interface is installed 
 if [ ! -f webin-cli-*.jar ]; then
     echo "Webin-CLI JAR file is not installed. Please install it to run this script."
     echo "Download it from https://github.com/enasequence/webin-cli/releases"
@@ -46,6 +48,7 @@ else
 fi
 
 # CHECKING INPUT FILES
+ 
 # Check if the credential file exists
 if [ ! -f "$CREDENDIAL" ]; then
     echo "Credential file '$CREDENDIAL' not found!"
@@ -61,7 +64,7 @@ if [ ! -f "$MANIFEST" ]; then
 else
     echo "Manifest file '$MANIFEST' found."
     
-    # Check if all mandatory fields are present in the manifest file
+    # Check if all mandatory fields are present in the manifest 
     MANDATORY_FIELDS=("STUDY" "SAMPLE" "ASSEMBLYNAME" "ASSEMBLY_TYPE" "COVERAGE" "PROGRAM" "PLATFORM")
     for field in "${MANDATORY_FIELDS[@]}"; do
         if ! grep -q "^$field" "$MANIFEST"; then
@@ -73,8 +76,10 @@ else
 fi
 
 # Check whether it is an unannotated or annotated genome
-# This is an unannotated genome
+
+# If this is an unannotated genome
 if grep -q "^FASTA" "$MANIFEST"; then
+    echo "This is an unannotated genome..."
     FASTA=$(grep "^FASTA" "$MANIFEST" | cut -f2)
     
     if [ ! -f "$FASTA" ]; then
@@ -86,13 +91,14 @@ if grep -q "^FASTA" "$MANIFEST"; then
     
     if grep -q "^FLATFILE" "$MANIFEST"; then
         echo "ERROR: this is an unannotated genome!"
-        echo "ERROR: no FLATFILE entry should be present in manifest file!"
+        echo "ERROR: no embl FLATFILE entry should be present in manifest file!"
         exit 1
     fi
 else
     # This is an annotated genome
-    # Check the presence of an embl flat file
+    # Check the presence of the embl flat file
     if grep -q "^FLATFILE" "$MANIFEST"; then
+        echo "This is an annotated genome..."
         FLATFILE=$(grep "^FLATFILE" "$MANIFEST" | cut -f2)
         if [ ! -f "$FLATFILE" ]; then
             echo "ERROR: embl flat file '$FLATFILE' not found!"
@@ -101,13 +107,15 @@ else
             echo "embl flat file '$FLATFILE' found."
         fi
     else
-        echo "ERROR: mandatory field 'FLATFILE' is missing in the manifest file!"
+        echo "ERROR: 'FLATFILE' line is missing in the manifest file!"
+        echo "ERROR: This is mandatory for annotated genomes"
         exit 1
     fi
 fi
 
 # Check the presence of a chromosome file
 if grep -q "^CHROMOSOME_LIST" "$MANIFEST"; then
+    echo "This is an chromosome submission..."
     CHROMOSOME_FILE=$(grep "^CHROMOSOME_LIST" "$MANIFEST" | cut -f2)
     if [ ! -f "$CHROMOSOME_FILE" ]; then
         echo "ERROR: chromosome file '$CHROMOSOME_FILE' not found!"
@@ -124,15 +132,15 @@ read user pass < $CREDENDIAL
 # ENA SUBMISSION 
 #===============================================================================
 
-if [ "$TEST" = true ]; then
-    echo "Running in test mode. No files will be submitted."
+if [ "$SUBMISSION" = "true" ]; then
+    echo "Running in submission mode. Files will be definitively submitted."
+    # Validate and submit the files
+    java -jar $WEBIN_CLI -context genome -manifest $MANIFEST -username $user -password $pass -submit
+    echo "Submission completed."
+else
+    echo "Running in test mode. No files will be submitted, validation only."
     # Simulate the submission process without actually submitting files
     java -jar $WEBIN_CLI -context genome -manifest $MANIFEST -username $user -password $pass -validate 
     echo "Test mode completed. No files were submitted."
     exit 0
-else
-    echo "Running in production mode. Files will be submitted."
-    # Validate and submit the files
-    java -jar $WEBIN_CLI -context genome -manifest $MANIFEST -username $user -password $pass -submit
-    echo "Submission completed."
 fi

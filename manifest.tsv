@@ -7,5 +7,6 @@ PROGRAM	TODO
 PLATFORM	TODO
 MOLECULETYPE	genomic DNA
 MINGAPLENGTH	TODO
+FASTA	flat-file.fasta.gz
 FLATFILE	flat-file.embl.gz
 CHROMOSOME_LIST	chromosome-list.tsv.gz

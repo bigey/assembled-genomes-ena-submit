@@ -14,7 +14,7 @@ TEST="true"
 # File containing the credentials. 
 # One line containing: 
 # username password
-CREDENDIAL=.credential
+CREDENDIAL=".credential"
 
 # MANIFEST FILE
 # The manifest file contains metadata about the genome assembly.

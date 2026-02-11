@@ -1,6 +1,6 @@
 # A Quick Guide to Submitting Genome Assemblies to ENA Using the Webin CLI
 
-This document is a quick guide that provides instructions on how to submit genome assemblies to the European Nucleotide Archive (ENA) using the Webin command line submission interface with. For complete information, please refer to the [ENA documentation](https://ena-docs.readthedocs.io/en/latest/submit/assembly.html).
+This document is a quick guide that provides instructions to submit genome assemblies to the European Nucleotide Archive (ENA) using the Webin command line submission interface (Webin CLI). For complete information, please refer to the [ENA documentation](https://ena-docs.readthedocs.io/en/latest/submit/assembly.html).
 
 ## Prerequisites
 
@@ -10,13 +10,13 @@ This document is a quick guide that provides instructions on how to submit genom
 
 Then prepare the following files:
 
-## Manifest file, **mandatory**
+## Manifest file, mandatory
 
 This is the main file that contains all the metadata about the genome assembly. The file is a tab-separated (TSV) text file with two columns. A template is available in this repository.
 
 The following metadata fields are supported in the manifest file for genome context:
 
-Mandatory fields:
+Mandatory metadata:
 `
 + `STUDY`: Study accession - **mandatory**, preregistered study (starts with `PRJEBxxxxxx` and is called the BioProject accession)
 + `SAMPLE`: Sample accession - **mandatory**, preregistered sample (starts with `SAMEAxxxxxx` and is called the BioSample accession)
@@ -26,7 +26,7 @@ Mandatory fields:
 + `PROGRAM`: The assembly program - **mandatory**
 + `PLATFORM`: The sequencing platform, or comma-separated list of platforms - **mandatory**
 
-Optional fields:
+Optional metadata:
 
 + `MOLECULETYPE`: "genomic DNA", "genomic RNA" or "viral cRNA" - **optional**
 + `MINGAPLENGTH`: Minimum length of consecutive Ns to be considered a gap in scaffolds - **optional**
@@ -34,15 +34,15 @@ Optional fields:
 + `RUN_REF`: Comma separated list of run accession(s) - **optional**
 + `AGP`: file that describes the assembly of scaffolds from contigs, or of chromosomes from scaffolds - **optional**
 
-Assembly specifics fields:
+Assembly specifics metadata:
 
 + `FASTA`: file containing the sequences in FASTA format - **mandatory** for **unannotated** assembly (see below)
 + `FLATFILE`: file containing the sequences in EMBL flat file format - **mandatory** for **annotated** assembly (see below)
 + `CHROMOSOME_LIST`: file containing the list of chromosomes - **mandatory** for fully assembled chromosomes (see below)
 
-In principle, the FASTA and FLATFILE metadata are mutually exclusive.
+In principle, the `FASTA` and `FLATFILE` metadata are mutually exclusive.
 
-## FASTA file for **unannotated** assemblies
+## FASTA file, unannotated assemblies
 
 The FASTA flat file is mandatory for **unannotated** assemblies.  It is obtained by concatenating the individual FASTA files and should be compressed with gzip.
 
@@ -56,7 +56,7 @@ Then add this line to the manifest file:
 
     FASTA<tab>flat-file.fasta.gz
 
-## EMBL file for **annotated** assemblies
+## EMBL file, annotated assemblies
 
 The EMBL flat file is mandatory for **annotated** assemblies. It is obtained by concatenating the individual EMBL files and should be compressed with gzip.
 
@@ -70,7 +70,7 @@ Then add this line to the manifest file:
 
     FLATFILE<tab>flat-file.embl.gz
 
-## Chromosome file for fully assembled **chromosomes**
+## Chromosome file, assembled chromosomes
 
 The chromosome file is required for fully assembled **chromosomes**.
 
@@ -102,6 +102,8 @@ The latest version of the Webin command line submission interface (Webin-CLI) ca
 
 When you are ready, submit your files using your login credentials (login:`Webin-XXXXX` and password:`YYYYYYY`).
 
+Java environment must be installed on your system.
+
 Run the following command to validate your submission files:
 
 ```sh
@@ -123,7 +125,7 @@ The script performs the following steps:
 1. Validates the submission files.
 2. Submits the assembly to the submission server.
 
-Edit the parameters at the beginning of the script to set the `PRODUCTION`, `CREDENTIAL`, and `MANIFEST` variables:
+Edit the parameters at the beginning of the script to set the `SUBMISSION`, `CREDENTIAL`, and `MANIFEST` variables:
 
 ```sh
 # Submit or test?
@@ -176,7 +178,7 @@ Biblatex
   author       = {Bigey, Frédéric},
   title        = {A Quick Guide to Submitting Genome Assemblies to ENA Using the Webin CLI},
   year         = {2026},
-  version      = {v1.2.0},
+  version      = {v1.0.0},
   url          = {https://github.com/bigey/assembled-genomes-ena-submit},
   note         = {accessed 2026-02-11}
 }

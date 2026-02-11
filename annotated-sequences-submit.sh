@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+# Author: Frederic BIGEY - INRAE
+# Last update: 2026-02-11
 # Downloaded from: https://github.com/bigey/assembled-genomes-ena-submit
 
 #================================================================================

@@ -1,5 +1,7 @@
 # A Quick Guide to Submitting Genome Assemblies to ENA Using the Webin CLI
 
+This guide is intended for GNU/Linux and macOS users only.
+
 This document is a quick guide that provides instructions to submit genome assemblies to the European Nucleotide Archive (ENA) using the Webin command line submission interface (Webin CLI). For complete information, please refer to the [ENA documentation](https://ena-docs.readthedocs.io/en/latest/submit/assembly.html).
 
 ## Prerequisites
@@ -17,7 +19,7 @@ This is the main file that contains all the metadata about the genome assembly. 
 The following metadata fields are supported in the manifest file for genome context:
 
 Mandatory metadata:
-`
+
 + `STUDY`: Study accession - **mandatory**, preregistered study (starts with `PRJEBxxxxxx` and is called the BioProject accession)
 + `SAMPLE`: Sample accession - **mandatory**, preregistered sample (starts with `SAMEAxxxxxx` and is called the BioSample accession)
 + `ASSEMBLYNAME`: Unique assembly name, user-provided - **mandatory**
@@ -102,9 +104,13 @@ The latest version of the Webin command line submission interface (Webin-CLI) ca
 
 When you are ready, submit your files using your login credentials (login:`Webin-XXXXX` and password:`YYYYYYY`).
 
-Java environment must be installed on your system.
+Java environment must be installed on your system. Test the installation by running the following command:
 
-Run the following command to validate your submission files:
+```sh
+java -version
+```
+
+Run the following command to validate (no submission, only testing) your files:
 
 ```sh
 java -jar webin-cli-x.y.z.jar -username Webin-XXXXX -password YYYYYYY -context genome -manifest manifest.tsv -validate
